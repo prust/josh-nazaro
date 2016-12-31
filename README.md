@@ -1,14 +1,16 @@
-## Future Mark
+## Josh Nazaro
 
 You are Simeon Jonason, a follower of religious firebrand, Josh Nazaro. Two religious groups and one political group have hired assassins to take out Josh; your job is to protect him and, if possible, to take out the assassins.
 
-Future Mark is a top-down 2D sci-fi action game.
+I'm currently focused on the gameplay and the controls right, so there aren't currently graphics -- just colored rectangles representing you, enemies, obstacles, etc.
+
+To play, download the LOVE engine from https://love2d.org/ and run `> love "."` from inside this repository.
 
 TODO:
 
-* If the bullet collides with the player & his shield isn't up (or isn't in the right direction), lose a life
-* Display the number of lives (starting at 3) in a corner of the screen
+* Fix bug where shield only works on bottom/right, not top/left
 * Pause the game & show a Game Over message when lives = 0
+* Display the number of lives (starting at 3) in a corner of the screen
 * Make the sniper(s) move less (& less erratically)
 * Add Josh Nazaro
 * Add the rest of your team

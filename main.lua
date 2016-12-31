@@ -2,6 +2,8 @@ local bump = require "lib.bump"
 local cron = require "lib.cron"
 local class = require "lib.middleclass"
 local vector = require "lib.vector"
+local _ = require "lib.moses"
+
 if arg[#arg] == "-debug" then require("mobdebug").start() end
 
 -- game variables
@@ -33,6 +35,7 @@ function Bullet:initialize(x, y, dir)
 end
 
 function Bullet:update(dt)
+  local should_remove = false
   local dir = self.dir * self.speed * dt
   local x = self.x + dir.x
   local y = self.y + dir.y
@@ -40,6 +43,32 @@ function Bullet:update(dt)
   local actualX, actualY, cols, len = world:move(self, x, y, function(item, other)
     return "bounce"
   end)
+
+  for i = 1, len do
+    local col = cols[i]
+    local other = col.other
+    if other.type == "player" then
+      local did_bounce = false
+      if other.shield_dir ~= nil then
+        -- TODO: this works for bottom and right, but not top or left
+        if other.shield_dir.x == 1 and col.touch.x == other.x + other.width then
+          did_bounce = true
+        elseif other.shield_dir.x == -1 and col.touch.x == other.x then
+          did_bounce = true
+        elseif other.shield_dir.y == 1 and col.touch.y == other.y + other.height then
+          did_bounce = true
+        elseif other.shield_dir.y == -1 and col.touch.y == other.y then
+          did_bounce = true
+        end
+      end
+      
+      if not did_bounce then
+        should_remove = true
+        other:injure()
+        world:remove(self)
+      end
+    end
+  end
 
   if actualX ~= x then
     self.dir.x = -self.dir.x
@@ -50,11 +79,14 @@ function Bullet:update(dt)
   
   self.x = actualX
   self.y = actualY
+  
+  return should_remove
 end
 
 -- Playable Character
 local Character = class('Character', Sprite)
 function Character:initialize()
+  self.type = "player"
   self.color = {255, 0, 0}
   self.width = 32
   self.height = 50
@@ -119,6 +151,10 @@ end
 function Character:shoot()
   local x, y = love.mouse.getPosition()
   shoot(self, x, y)
+end
+
+function Character:injure()
+  self.lives = self.lives and self.lives - 1 or 5
 end
 
 -- enemy
@@ -261,8 +297,23 @@ function love.update(dt)
   for i = 1, #enemies do
     enemies[i]:update(dt)
   end
+  
+  local bullets_to_remove = {}
   for i = 1, #bullets do
-    bullets[i]:update(dt)
+    local should_remove = bullets[i]:update(dt)
+    if should_remove then
+      table.insert(bullets_to_remove, i)
+    end
+  end
+  
+  -- remove removed bullets in reverse order to not mess up iteration
+  for i = #bullets_to_remove, 1, -1 do
+    table.remove(bullets, bullets_to_remove[i])
+  end
+
+  -- only compact if there is a need, for performance reasons
+  if _.any(bullets, function(val) return not val end) then
+    bullets = _.compact(bullets)
   end
 end
 
