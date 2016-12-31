@@ -1,6 +1,6 @@
 ## Future Mark
 
-You are Simeon Jonason, a follower of a religious luminary, Josh Nazaro. Numerous factions have hired assassins to take out Josh; your job is to protect him and, if possible, to take out the assassins.
+You are Simeon Jonason, a follower of religious firebrand, Josh Nazaro. Two religious groups and one political group have hired assassins to take out Josh; your job is to protect him and, if possible, to take out the assassins.
 
 Future Mark is a top-down 2D sci-fi action game.
 
