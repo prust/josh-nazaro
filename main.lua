@@ -6,6 +6,10 @@ local _ = require "lib.moses"
 
 if arg[#arg] == "-debug" then require("mobdebug").start() end
 
+-- constants
+MOUSE_BTN_1 = 1
+MOUSE_BTN_2 = 2
+
 -- game variables
 local is_paused = false
 local speed = 256
@@ -24,7 +28,7 @@ end
 
 local Bullet = class('Bullet', Sprite)
 function Bullet:initialize(x, y, dir)
-  self.speed = 500
+  self.speed = 250
   self.color = {255, 0, 0}
   self.width = 4
   self.height = 4
@@ -53,11 +57,11 @@ function Bullet:update(dt)
         -- TODO: this works for bottom and right, but not top or left
         if other.shield_dir.x == 1 and col.touch.x == other.x + other.width then
           did_bounce = true
-        elseif other.shield_dir.x == -1 and col.touch.x == other.x then
-          did_bounce = true
         elseif other.shield_dir.y == 1 and col.touch.y == other.y + other.height then
           did_bounce = true
-        elseif other.shield_dir.y == -1 and col.touch.y == other.y then
+        elseif other.shield_dir.x == -1 and col.touch.x + self.width == other.x then
+          did_bounce = true
+        elseif other.shield_dir.y == -1 and col.touch.y + self.height == other.y then
           did_bounce = true
         end
       end
@@ -67,6 +71,9 @@ function Bullet:update(dt)
         other:injure()
         world:remove(self)
       end
+    elseif other.type == "wall" then
+      should_remove = true
+      world:remove(self)
     end
   end
 
@@ -115,7 +122,7 @@ function Character:update(dt)
   self.y = actualY
   
   -- shield support
-  if love.keyboard.isDown("lshift") then
+  if love.mouse.isDown(MOUSE_BTN_2) then
     local mouse_x, mouse_y = love.mouse.getPosition()
     dir = vector(mouse_x - self.x, mouse_y - self.y)
     if dir.x == 0 and dir.y == 0 then
@@ -289,6 +296,14 @@ function love.load(arg)
   addSprite(pc)
   
   generateBlocks()
+  
+  -- add 4 walls around the visible screen to prevent players/enemies from going offscreen
+  local win_width = love.graphics.getWidth()
+  local win_height = love.graphics.getHeight()
+  addSprite({type="wall", x=-1, y=-1, height=1, width = win_width + 2})
+  addSprite({type="wall", x=-1,y=-1, height = win_height + 2, width = 1})
+  addSprite({type="wall", x=win_width+1, y=-1, height = win_height + 2, width = 1})
+  addSprite({type="wall", x=-1, y = win_height+1, height = 1, width = win_width + 2})
 end
 
 function love.update(dt)
@@ -340,5 +355,7 @@ function love.keypressed(k)
 end
 
 function love.mousereleased(x, y, button, istouch)
-  pc:shoot()
+  if button == MOUSE_BTN_1 and not love.mouse.isDown(MOUSE_BTN_2) then
+    pc:shoot()
+  end
 end

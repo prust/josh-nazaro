@@ -8,10 +8,9 @@ To play, download the LOVE engine from https://love2d.org/ and run `> love "."` 
 
 TODO:
 
-* Fix bug where shield only works on bottom/right, not top/left
+* Injure/disable enemies when bullets hit them (bullets shouldn't bounce off them)
 * Pause the game & show a Game Over message when lives = 0
 * Display the number of lives (starting at 3) in a corner of the screen
-* Make the sniper(s) move less (& less erratically)
 * Add Josh Nazaro
 * Add the rest of your team
 
