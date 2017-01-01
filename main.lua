@@ -103,6 +103,7 @@ function Character:initialize()
   self.height = 50
   self.x = 0
   self.y = 0
+  self.lives = 4
   Sprite.initialize(self)
 end
 
@@ -165,7 +166,10 @@ function Character:shoot()
 end
 
 function Character:injure()
-  self.lives = self.lives and self.lives - 1 or 5
+  self.lives = self.lives - 1
+  if self.lives == 0 then
+    is_paused = true
+  end
 end
 
 -- enemy
@@ -350,7 +354,7 @@ function love.update(dt)
   end
 end
 
-function love.draw()
+function love.draw()  
   pc:draw()
   
   for i = 1, #blocks do
@@ -363,6 +367,13 @@ function love.draw()
   
   for i = 1, #bullets do
     bullets[i]:draw()
+  end
+  
+  if is_paused then
+    love.graphics.setColor(255, 255, 255)
+    local win_width = love.graphics.getWidth()
+    local win_height = love.graphics.getHeight()
+    love.graphics.print("Game Over", win_width / 2 - 50, win_height / 2 - 30, 0, 2, 2)
   end
 end
 
