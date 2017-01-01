@@ -8,7 +8,6 @@ To play, download the LOVE engine from https://love2d.org/ and run `> love "."` 
 
 TODO:
 
-* Injure/disable enemies when bullets hit them (bullets shouldn't bounce off them)
 * Pause the game & show a Game Over message when lives = 0
 * Display the number of lives (starting at 3) in a corner of the screen
 * Add Josh Nazaro

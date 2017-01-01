@@ -74,6 +74,10 @@ function Bullet:update(dt)
     elseif other.type == "wall" then
       should_remove = true
       world:remove(self)
+    elseif other.type == "enemy" and self.shooter == "player" then
+      should_remove = true
+      other:injure()
+      world:remove(self)
     end
   end
 
@@ -167,6 +171,7 @@ end
 -- enemy
 local Enemy = class('Enemy', Sprite)
 function Enemy:initialize(x, y)
+  self.type = "enemy"
   self.color = {0, 0, 255}
   self.width = 32
   self.height = 32
@@ -193,6 +198,18 @@ function Enemy:update(dt)
   local actualX, actualY, cols, len = world:move(self, x, y)
   self.x = actualX
   self.y = actualY
+end
+
+function Enemy:injure()
+  world:remove(self)
+  local ix
+  for i = 1, #enemies do
+    if enemies[i] == self then
+      ix = i
+    end
+  end
+  
+  table.remove(enemies, ix)
 end
 
 function Enemy:shoot()
@@ -243,6 +260,7 @@ function shoot(shooter, target_x, target_y)
   local y = shooter.y + shooter.height / 2
   
   local bullet = Bullet:new(x, y, dir)
+  bullet.shooter = shooter.type
   addSprite(bullet)
   table.insert(bullets, bullet)
 end
